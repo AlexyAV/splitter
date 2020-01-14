@@ -57,7 +57,7 @@ func (s *Splitter) Download() error {
 
 	for {
 		nRange, err := rb.NextRange()
-		if err == EOR {
+		if err == ErrOutOfRange {
 			break
 		}
 

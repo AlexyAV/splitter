@@ -2,7 +2,6 @@ package splitter
 
 import (
 	"context"
-	"fmt"
 	"testing"
 )
 
@@ -21,8 +20,6 @@ func TestNewChunkRequest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	fmt.Println(r.Header.Get("Range"))
 
 	if r.Header.Get("Range") != expected {
 		t.Errorf("Range - %s, expected - %s.", r.Header.Get("Range"), expected)

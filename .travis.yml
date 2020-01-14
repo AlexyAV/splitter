@@ -1,16 +1,6 @@
 language: go
 go:
   - 1.11.x
-  - master
-
-go_import_path: golang.org/x/splitter
-
-install:
-  - go get -t -v ./...
 
 script:
   - go test -v -race ./...
-
-matrix:
-  allow_failures:
-    - go: master

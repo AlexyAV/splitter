@@ -7,7 +7,7 @@ import (
 )
 
 // ErrOutOfRange is the error returned by NextRange when no more range is available.
-var ErrOutOfRange = errors.New("EOR")
+var ErrOutOfRange = errors.New("ErrOutOfRange")
 
 // DownloadRange is a basic data structure for storing bytes range data.
 // Min Start value is 0 and max End value is file size.
@@ -49,7 +49,7 @@ func NewRangeBuilder(length int, chunkCount int) *RangeBuilder {
 }
 
 // NextRange iterates over content length and creates new DownloadRange instance
-// on each iteration. If end of range was reached EOR error will be returned.
+// on each iteration. If end of range was reached ErrOutOfRange error will be returned.
 func (rb *RangeBuilder) NextRange() (DownloadRange, error) {
 	if rb.end == rb.contentLen {
 		return DownloadRange{}, ErrOutOfRange

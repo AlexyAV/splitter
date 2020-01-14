@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	splitter "splitter/src"
+	"splitter"
 )
 
 func Example() {
@@ -16,7 +16,7 @@ func Example() {
 	}
 
 	// Create Splitter instance with new PathInfo and 10 chunks
-	s := splitter.NewSplitter(pi, 10, context.Background())
+	s := splitter.NewSplitter(context.Background(), pi, 10)
 
 	// Start file download
 	err = s.Download()
@@ -52,7 +52,7 @@ func ExampleRangeBuilder_NextRange() {
 	for {
 		r, err := rb.NextRange()
 
-		if err == splitter.EOR {
+		if err == splitter.ErrOutOfRange {
 			break
 		}
 
