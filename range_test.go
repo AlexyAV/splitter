@@ -1,4 +1,5 @@
 package splitter
+
 //
 //import (
 //    "fmt"
