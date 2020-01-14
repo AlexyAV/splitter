@@ -1,4 +1,4 @@
-package splitter
+package splitter_test
 
 import (
 	"context"
