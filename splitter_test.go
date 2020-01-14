@@ -13,7 +13,7 @@ func TestNewChunkRequest(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	s := NewSplitter(pi, 10, context.Background())
+	s := NewSplitter(context.Background(), pi, 10)
 	dr := DownloadRange{Start: 10, End: 20}
 	expected := "bytes=10-19"
 
