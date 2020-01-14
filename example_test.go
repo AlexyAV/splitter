@@ -1,10 +1,10 @@
-package splitter_test
+package splitter
 
 import (
 	"context"
 	"fmt"
+	"github.com/AlexyAV/splitter"
 	"log"
-	"splitter"
 )
 
 func Example() {

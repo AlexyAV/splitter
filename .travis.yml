@@ -1,11 +1,8 @@
 language: go
+env: GO111MODULE=on
 go:
   - 1.11.x
-  - master
-os:
-  - linux
-  - osx
-dist: trusty
-sudo: false
+git:
+  depth: 1
 script:
-  - env GO111MODULE=on go test
+  - go test -v -race ./...
