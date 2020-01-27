@@ -136,7 +136,7 @@ func (s *Splitter) writeChunk(r io.Reader, offset int64) (int, error) {
 // fetchContentLength issues a HEAD to the provided source and
 // retrieves content length. Converts content length to int value.
 func (s *Splitter) fetchContentLength() (int, error) {
-	headResponse, err := http.Head(s.PI.Source.String())
+	headResponse, err := http.Get(s.PI.Source.String())
 	if err != nil {
 		return 0, &splitterError{
 			context: "cannot fetch content length",

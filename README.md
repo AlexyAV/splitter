@@ -19,7 +19,7 @@ import (
 <pre lang="go">
 func main() {
   // With absolute destination path
-  pr := splitter.NewPathResolver("https://picsum.photos/200", "/tmp/")
+  pr := splitter.NewPathResolver("https://i.picsum.photos/id/311/1000/1500.jpg", "/tmp/")
   pi, err := pr.PathInfo()
   if err != nil {
     log.Fatal(err)

@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"github.com/google/uuid"
 )
 
 // PathResolverError represent error message and context for path resolver.
@@ -72,7 +73,7 @@ func (pr *PathResolver) resolveDest() (*os.File, error) {
 		return nil, err
 	}
 
-	if len(path.Ext(path.Base(pr.Dest))) != 0 {
+	if extProvided(pr.Dest) {
 		f, err := os.OpenFile(pr.Dest, os.O_RDWR|os.O_TRUNC, 0666)
 		if err != nil {
 			return nil, &PathResolverError{
@@ -84,7 +85,18 @@ func (pr *PathResolver) resolveDest() (*os.File, error) {
 		return f, nil
 	}
 
-	d, err := os.Create(path.Join(pr.Dest, path.Base(pr.Source)))
+	basePath := path.Base(pr.Source)
+
+	if !extProvided(pr.Source) {
+		var err error
+
+		basePath, err = pr.generateName()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	d, err := os.Create(path.Join(pr.Dest, basePath))
 	if err != nil {
 		return nil, &PathResolverError{
 			context: "cannot resolve destination source",
@@ -93,4 +105,25 @@ func (pr *PathResolver) resolveDest() (*os.File, error) {
 	}
 
 	return d, nil
+}
+
+// generateName generates a random name based on UUID version 4.
+// A random name will be used in case both Source and Dest paths
+// do not contain file extension. To prevent file name collision
+// random file name will be used.
+func (pr *PathResolver) generateName() (string, error) {
+	randName, err := uuid.NewRandom()
+	if err != nil {
+		return "", &PathResolverError{
+			context: fmt.Sprint("cannot generate name\n"),
+			err:     err,
+		}
+	}
+
+	return randName.String(), nil
+}
+
+// extProvided checks if the path contains an extension part.
+func extProvided(p string) bool {
+	return len(path.Ext(path.Base(p))) != 0
 }
