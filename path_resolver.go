@@ -2,10 +2,10 @@ package splitter
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"net/url"
 	"os"
 	"path"
-	"github.com/google/uuid"
 )
 
 // PathResolverError represent error message and context for path resolver.
