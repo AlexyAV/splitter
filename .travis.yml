@@ -5,4 +5,5 @@ go:
 git:
   depth: 1
 script:
+  - go mod download
   - go test -v -race ./...

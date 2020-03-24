@@ -1,33 +1,25 @@
 package splitter
 
 import (
-	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestNextRange(t *testing.T) {
 	rb := NewRangeBuilder(100, 10)
+	lastRangeHeader := ""
 
 	for i := 0; i < 10; i++ {
 		r, err := rb.NextRange()
 
-		if err != nil {
-			t.Error(err)
-		}
+		assert.NoError(t, err)
+		assert.NotEqual(t, r.Start, r.End)
 
-		if r.Start == r.End {
-			t.Errorf("DownloadRange start %d = end %d", r.Start, r.End)
-		}
-
-		brh := r.BuildRangeHeader()
-
-		if brh == fmt.Sprintf("bytes=%s-%s", string(r.Start), string(r.End)) {
-			t.Errorf("BuildRangeHeader for start %d and end %d: %s", r.Start, r.End, brh)
-		}
+		lastRangeHeader = r.BuildRangeHeader()
 	}
+
+	assert.Equal(t, "bytes=90-99", lastRangeHeader)
 
 	_, err := rb.NextRange()
-	if err == nil {
-		t.Error("NextRange() unexpected result end of range EOD")
-	}
+	assert.EqualError(t, err, "ErrOutOfRange")
 }
