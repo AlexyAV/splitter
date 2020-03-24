@@ -14,7 +14,7 @@ var (
 	GetHeadFunc func(url string) (*http.Response, error)
 )
 
-type mockClient struct{
+type mockClient struct {
 	mock.Mock
 }
 
@@ -69,8 +69,8 @@ func TestNewSourceContentLengthError(t *testing.T) {
 
 	GetHeadFunc = func(url string) (*http.Response, error) {
 		return &http.Response{
-			StatusCode:    200,
-			Header:        http.Header{"Content-Type": []string{"image/jpeg"}},
+			StatusCode: 200,
+			Header:     http.Header{"Content-Type": []string{"image/jpeg"}},
 		}, nil
 	}
 
