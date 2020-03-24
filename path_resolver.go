@@ -2,10 +2,10 @@ package splitter
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 // PathResolverError represent error message and context for path resolver.
@@ -20,7 +20,7 @@ func (pr *PathResolverError) Error() string {
 
 // A PathInfo is simple storage for source and destination paths.
 type PathInfo struct {
-	Source *url.URL
+	Source *Source
 	Dest   *os.File
 }
 
@@ -30,27 +30,34 @@ type PathInfo struct {
 type PathResolver struct {
 	Source string
 	Dest   string
+	client HTTPClient
 }
 
 // NewPathResolver creates new PathResolver instance.
-func NewPathResolver(source string, dest string) *PathResolver {
-	return &PathResolver{source, dest}
+func NewPathResolver(source string, dest string, client HTTPClient) *PathResolver {
+	destAbs, _ := filepath.Abs(dest)
+	return &PathResolver{Source: source, Dest: destAbs, client: client}
 }
 
 // PathInfo resolves provided source and dest path and creates PathInfo instance
 // with resolved source as *url.URL and dest as *os.File.
 func (pr *PathResolver) PathInfo() (*PathInfo, error) {
-	s, err := pr.resolveSource()
+	rawSource, err := pr.resolveSource()
 	if err != nil {
 		return nil, err
 	}
 
-	df, err := pr.resolveDest()
+	s, err := NewSource(rawSource, pr.client)
 	if err != nil {
 		return nil, err
 	}
 
-	return &PathInfo{Source: s, Dest: df}, nil
+	d, err := pr.resolveDest(s)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PathInfo{Source: s, Dest: d}, nil
 }
 
 // resolveSource resolves provided source path and create *url.URL instance
@@ -68,7 +75,7 @@ func (pr *PathResolver) resolveSource() (*url.URL, error) {
 // or return error in case of invalid path or lack of permissions. It accepts
 // full path with file extension as well as dir path. In last case file name
 // from source will be used.
-func (pr *PathResolver) resolveDest() (*os.File, error) {
+func (pr *PathResolver) resolveDest(s *Source) (*os.File, error) {
 	if _, err := os.Stat(pr.Dest); os.IsNotExist(err) {
 		return nil, err
 	}
@@ -77,7 +84,7 @@ func (pr *PathResolver) resolveDest() (*os.File, error) {
 		f, err := os.OpenFile(pr.Dest, os.O_RDWR|os.O_TRUNC, 0666)
 		if err != nil {
 			return nil, &PathResolverError{
-				context: fmt.Sprintf("cannot open file - %s\n", pr.Dest),
+				context: fmt.Sprintf("cannot open file - %s", pr.Dest),
 				err:     err,
 			}
 		}
@@ -88,12 +95,7 @@ func (pr *PathResolver) resolveDest() (*os.File, error) {
 	basePath := path.Base(pr.Source)
 
 	if !extProvided(pr.Source) {
-		var err error
-
-		basePath, err = pr.generateName()
-		if err != nil {
-			return nil, err
-		}
+		basePath += s.Ext
 	}
 
 	d, err := os.Create(path.Join(pr.Dest, basePath))
@@ -107,23 +109,7 @@ func (pr *PathResolver) resolveDest() (*os.File, error) {
 	return d, nil
 }
 
-// generateName generates a random name based on UUID version 4.
-// A random name will be used in case both Source and Dest paths
-// do not contain file extension. To prevent file name collision
-// random file name will be used.
-func (pr *PathResolver) generateName() (string, error) {
-	randName, err := uuid.NewRandom()
-	if err != nil {
-		return "", &PathResolverError{
-			context: fmt.Sprint("cannot generate name\n"),
-			err:     err,
-		}
-	}
-
-	return randName.String(), nil
-}
-
 // extProvided checks if the path contains an extension part.
 func extProvided(p string) bool {
-	return len(path.Ext(path.Base(p))) != 0
+	return len(filepath.Ext(filepath.Base(p))) != 0
 }

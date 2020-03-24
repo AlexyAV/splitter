@@ -18,20 +18,24 @@ import (
 # Usage
 <pre lang="go">
 func main() {
-  // With absolute destination path
-  pr := splitter.NewPathResolver("https://i.picsum.photos/id/311/1000/1500.jpg", "/tmp/")
-  pi, err := pr.PathInfo()
-  if err != nil {
-    log.Fatal(err)
-  }
+    // With absolute destination path
+	pr := splitter.NewPathResolver(
+		"https://via.placeholder.com/3000",
+		"/tmp/",
+		&http.Client{},
+	)
+	pi, err := pr.PathInfo()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-  // Create Splitter instance with new PathInfo and 10 chunks
-  s := splitter.NewSplitter(context.Background(), pi, 10)
+	// Create Splitter instance with new PathInfo and 10 chunks
+	s := splitter.NewSplitter(context.Background(), pi, 10, &http.Client{})
 
-  // Start file download
-  err = s.Download()
-  if err != nil {
-    log.Fatal(err)
-  }
+	// Start file download
+	err = s.Download()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 </pre>

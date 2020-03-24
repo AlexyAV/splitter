@@ -3,20 +3,25 @@ package splitter_test
 import (
 	"context"
 	"fmt"
-	"github.com/AlexyAV/splitter"
 	"log"
+	"net/http"
+	"splitter"
 )
 
 func Example() {
 	// With absolute destination path
-	pr := splitter.NewPathResolver("https://picsum.photos/200", "/tmp/")
+	pr := splitter.NewPathResolver(
+		"https://via.placeholder.com/3000",
+		"/tmp/",
+		&http.Client{},
+	)
 	pi, err := pr.PathInfo()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Create Splitter instance with new PathInfo and 10 chunks
-	s := splitter.NewSplitter(context.Background(), pi, 10)
+	s := splitter.NewSplitter(context.Background(), pi, 10, &http.Client{})
 
 	// Start file download
 	err = s.Download()
@@ -27,7 +32,11 @@ func Example() {
 
 func ExampleNewPathResolver() {
 	// With absolute destination path
-	pr := splitter.NewPathResolver("https://picsum.photos/200", "/tmp/")
+	pr := splitter.NewPathResolver(
+		"https://via.placeholder.com/3000",
+		"/tmp/",
+		&http.Client{},
+	)
 
 	// Current directory will be used as destination
 	// splitter.NewPathResolver("https://picsum.photos/200", ".")
@@ -40,7 +49,7 @@ func ExampleNewPathResolver() {
 	fmt.Printf("%T\n", pi.Source)
 	fmt.Printf("%T\n", pi.Dest)
 	// Output:
-	// *url.URL
+	// *splitter.Source
 	// *os.File
 }
 

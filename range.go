@@ -12,8 +12,7 @@ var ErrOutOfRange = errors.New("ErrOutOfRange")
 // DownloadRange is a basic data structure for storing bytes range data.
 // Min Start value is 0 and max End value is file size.
 type DownloadRange struct {
-	Start int
-	End   int
+	Start, End int
 }
 
 // BuildRangeHeader builds bytes range for http Range header
@@ -28,11 +27,7 @@ func (dr *DownloadRange) BuildRangeHeader() string {
 // A RangeBuilder allows to iterate over convent length and split it on separate
 // DownloadRange on each iteration.
 type RangeBuilder struct {
-	contentLen int
-	rangeSize  int
-	remainder  int
-	start      int
-	end        int
+	contentLen, rangeSize, remainder, start, end int
 }
 
 // NewRangeBuilder creates an instance of RangeBuilder based on total length
