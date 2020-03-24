@@ -18,7 +18,7 @@ import (
 # Usage
 <pre lang="go">
 func main() {
-    // With absolute destination path
+	// With absolute destination path
 	pr := splitter.NewPathResolver(
 		"https://via.placeholder.com/3000",
 		"/tmp/",
