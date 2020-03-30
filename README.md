@@ -1,7 +1,7 @@
+[![GoDoc](https://godoc.org/github.com/AlexyAV/splitter?status.svg)](https://godoc.org/github.com/AlexyAV/splitter)
 [![Build Status](https://travis-ci.org/AlexyAV/splitter.svg?branch=master)](https://travis-ci.org/AlexyAV/splitter)
 [![codecov.io](https://codecov.io/gh/AlexyAV/splitter/coverage.svg?branch=master)](https://codecov.io/gh/AlexyAV/splitter)
 [![Go Report Card](https://goreportcard.com/badge/github.com/AlexyAV/splitter)](https://goreportcard.com/report/github.com/AlexyAV/splitter)
-[![GoDoc](https://godoc.org/github.com/AlexyAV/splitter?status.svg)](https://godoc.org/github.com/AlexyAV/splitter)
 # Splitter 
 Simple Go package for file chunk async download that made just for fun. Choose a file, slice it up, download it. Please do not set 20 chunks for a 10kb file.
 
