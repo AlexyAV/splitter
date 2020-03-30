@@ -92,7 +92,7 @@ func (pr *PathResolver) resolveDest(s *Source) (*os.File, error) {
 		return f, nil
 	}
 
-	basePath := path.Base(pr.Source)
+	basePath := path.Base(s.Path.Path)
 
 	if !extProvided(pr.Source) {
 		basePath += s.Ext

@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	GetDoFunc   func(req *http.Request) (*http.Response, error)
-	GetHeadFunc func(url string) (*http.Response, error)
+	GetDoFunc  func(req *http.Request) (*http.Response, error)
+	GetGetFunc func(url string) (resp *http.Response, err error)
 )
 
 type mockClient struct {
@@ -22,15 +22,15 @@ func (m *mockClient) Do(req *http.Request) (*http.Response, error) {
 	return GetDoFunc(req)
 }
 
-func (m *mockClient) Head(url string) (*http.Response, error) {
-	return GetHeadFunc(url)
+func (m *mockClient) Get(url string) (resp *http.Response, err error) {
+	return GetGetFunc(url)
 }
 
 func TestNewSource(t *testing.T) {
 	httpClient := &mockClient{}
 	testUrl, _ := url.Parse("http://test-url.com/image/source.jpg")
 
-	GetHeadFunc = func(url string) (*http.Response, error) {
+	GetGetFunc = func(url string) (resp *http.Response, err error) {
 		return &http.Response{
 			StatusCode:    200,
 			Header:        http.Header{"Content-Type": []string{"image/jpeg"}},
@@ -50,7 +50,7 @@ func TestNewSourceRequestError(t *testing.T) {
 	httpClient := &mockClient{}
 	testUrl, _ := url.Parse("http://test-url.com/image/source.jpg")
 
-	GetHeadFunc = func(url string) (*http.Response, error) {
+	GetGetFunc = func(url string) (*http.Response, error) {
 		return nil, errors.New("request failed")
 	}
 
@@ -67,7 +67,7 @@ func TestNewSourceContentLengthError(t *testing.T) {
 	httpClient := &mockClient{}
 	testUrl, _ := url.Parse("http://test-url.com/image/source.jpg")
 
-	GetHeadFunc = func(url string) (*http.Response, error) {
+	GetGetFunc = func(url string) (*http.Response, error) {
 		return &http.Response{
 			StatusCode: 200,
 			Header:     http.Header{"Content-Type": []string{"image/jpeg"}},
@@ -87,7 +87,7 @@ func TestNewSourceContentTypeError(t *testing.T) {
 	httpClient := &mockClient{}
 	testUrl, _ := url.Parse("http://test-url.com/image/source.jpg")
 
-	GetHeadFunc = func(url string) (*http.Response, error) {
+	GetGetFunc = func(url string) (*http.Response, error) {
 		return &http.Response{
 			StatusCode:    200,
 			ContentLength: 100,

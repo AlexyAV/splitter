@@ -25,7 +25,7 @@ func TestSplitter_Download(t *testing.T) {
 		ContentLength: 6,
 	}
 
-	GetHeadFunc = func(url string) (*http.Response, error) {
+	GetGetFunc = func(url string) (resp *http.Response, err error) {
 		return mockResponse, nil
 	}
 

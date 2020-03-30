@@ -40,7 +40,7 @@ func TestPathResolver_PathInfoSourceError(t *testing.T) {
 }
 
 func TestPathResolver_PathInfoSourceInfoError(t *testing.T) {
-	GetHeadFunc = func(url string) (*http.Response, error) {
+	GetGetFunc = func(url string) (*http.Response, error) {
 		return nil, errors.New("http error")
 	}
 
@@ -215,7 +215,7 @@ func TestResolveDestSourceError(t *testing.T) {
 }
 
 func prepareHttpClientResp() {
-	GetHeadFunc = func(url string) (*http.Response, error) {
+	GetGetFunc = func(url string) (*http.Response, error) {
 		return &http.Response{
 			StatusCode:    200,
 			Header:        http.Header{"Content-Type": []string{"image/jpeg"}},

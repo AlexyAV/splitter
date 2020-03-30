@@ -8,5 +8,5 @@ import (
 // http.Client.
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
-	Head(url string) (*http.Response, error)
+	Get(url string) (resp *http.Response, err error)
 }

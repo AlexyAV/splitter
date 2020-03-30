@@ -36,12 +36,12 @@ func NewSource(source *url.URL, client HTTPClient) (*Source, error) {
 	return s, err
 }
 
-// enrichSourceInfo retrieves all necessary source attributes with HEAD http
+// enrichSourceInfo retrieves all necessary source attributes with GET http
 // request. Specifically it tries to fetch source size, content type,
 // extension and fills up Source struct .If at least one of this attributes is
 // unavailable then error will be returned.
 func (s *Source) enrichSourceInfo() error {
-	headResponse, err := s.client.Head(s.Path.String())
+	headResponse, err := s.client.Get(s.Path.String())
 	if err != nil {
 		return &SourceError{
 			context: "cannot fetch source info",
