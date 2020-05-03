@@ -32,14 +32,17 @@ type RangeBuilder struct {
 
 // NewRangeBuilder creates an instance of RangeBuilder based on total length
 // and chunks count into which total length will be split.
-func NewRangeBuilder(length int, chunkCount int) *RangeBuilder {
-	remainder := length % chunkCount
-	rangeSize := (length - remainder) / chunkCount
+func NewRangeBuilder(length, chunkCount, offset int) *RangeBuilder {
+	adjLength := length - offset
+	remainder := adjLength % chunkCount
+	rangeSize := (adjLength - remainder) / chunkCount
 
 	return &RangeBuilder{
 		contentLen: length,
 		remainder:  remainder,
 		rangeSize:  rangeSize,
+		start:      offset,
+		end:        offset,
 	}
 }
 
@@ -52,7 +55,7 @@ func (rb *RangeBuilder) NextRange() (DownloadRange, error) {
 
 	chunkSize := rb.rangeSize
 
-	if rb.end == 0 {
+	if rb.end == rb.start {
 		chunkSize = rb.rangeSize + rb.remainder
 	}
 

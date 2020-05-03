@@ -56,7 +56,7 @@ func ExampleNewPathResolver() {
 func ExampleRangeBuilder_NextRange() {
 	contentLength := 55
 	chunkCount := 6
-	rb := splitter.NewRangeBuilder(contentLength, chunkCount)
+	rb := splitter.NewRangeBuilder(contentLength, chunkCount, 0)
 
 	for {
 		r, err := rb.NextRange()

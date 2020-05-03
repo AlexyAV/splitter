@@ -81,7 +81,7 @@ func (pr *PathResolver) resolveDest(s *Source) (*os.File, error) {
 	}
 
 	if extProvided(pr.Dest) {
-		f, err := os.OpenFile(pr.Dest, os.O_RDWR|os.O_TRUNC, 0666)
+		f, err := os.OpenFile(pr.Dest, os.O_RDWR, 0666)
 		if err != nil {
 			return nil, &PathResolverError{
 				context: fmt.Sprintf("cannot open file - %s", pr.Dest),

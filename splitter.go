@@ -43,8 +43,43 @@ func NewSplitter(ctx context.Context, pi *PathInfo, chunkCnt int, c HTTPClient) 
 // creates DownloadRange iterator. Each file's chunk will be downloaded
 // asynchronously.
 func (s *Splitter) Download() error {
+	err := s.PI.Dest.Truncate(0)
+	if err != nil {
+		return &splitterError{
+			context: "cannot truncate destination file",
+			err:     err,
+		}
+	}
+
+	_, _ = s.PI.Dest.Seek(0, 0)
+
+	return s.process(NewRangeBuilder(s.PI.Source.Size, s.ChunkCnt, 0))
+}
+
+// Resume resumes interrupted download process. It checks for the content length
+// of a source file and destination file respectively. Base on the current
+// destination file new DownloadRange iterator will be created. Each file's
+// chunk will be downloaded asynchronously.
+//
+// Unlike Download it will not override existing content. If you need a clean
+// download use Download method.
+func (s *Splitter) Resume() error {
+	ds, err := s.PI.Dest.Stat()
+	if err != nil {
+		return &splitterError{
+			context: "cannot fetch destination size",
+			err:     err,
+		}
+	}
+
+	return s.process(
+		NewRangeBuilder(s.PI.Source.Size, s.ChunkCnt, int(ds.Size())),
+	)
+}
+
+// process initialize download process.
+func (s *Splitter) process(rb *RangeBuilder) error {
 	var g errgroup.Group
-	rb := NewRangeBuilder(s.PI.Source.Size, s.ChunkCnt)
 
 	for {
 		nRange, err := rb.NextRange()
@@ -95,22 +130,24 @@ func (s *Splitter) writeChunk(r io.Reader, offset int64) (int, error) {
 	written := 0
 
 	for {
-		m, err := r.Read(buf[0:cap(buf)])
-		if err == io.EOF {
+		m, eof := r.Read(buf[0:cap(buf)])
+
+		if m > 0 {
+			_, err := s.PI.Dest.WriteAt(buf[:m], offset)
+			if err != nil {
+				return 0, &splitterError{
+					context: "error on writing data",
+					err:     err,
+				}
+			}
+
+			written += m
+			offset += int64(m)
+		}
+
+		if eof == io.EOF {
 			break
 		}
-
-		buf = buf[:m]
-
-		_, err = s.PI.Dest.WriteAt(buf, offset)
-		if err != nil {
-			return 0, &splitterError{
-				context: "error on writing data",
-				err:     err,
-			}
-		}
-		written += m
-		offset += int64(m)
 	}
 
 	return written, nil
