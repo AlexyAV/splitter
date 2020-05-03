@@ -3,9 +3,9 @@ package splitter_test
 import (
 	"context"
 	"fmt"
+	"github.com/AlexyAV/splitter"
 	"log"
 	"net/http"
-	"splitter"
 )
 
 func Example() {
