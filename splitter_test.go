@@ -47,6 +47,124 @@ func TestSplitter_Download(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestSplitterDownloadTruncateError(t *testing.T) {
+	dir, f := initTmpStorage()
+	defer os.RemoveAll(dir)
+
+	mockResponse := &http.Response{
+		StatusCode:    200,
+		ProtoMajor:    1,
+		ProtoMinor:    0,
+		Header:        http.Header{"Content-Type": []string{"text/plain"}},
+		Body:          ioutil.NopCloser(strings.NewReader("abcdef")),
+		ContentLength: 6,
+	}
+
+	GetGetFunc = func(url string) (resp *http.Response, err error) {
+		return mockResponse, nil
+	}
+
+	GetDoFunc = func(req *http.Request) (*http.Response, error) {
+		return mockResponse, nil
+	}
+
+	pr := PathResolver{
+		Source: "http://test-url.com/test/text",
+		Dest:   f.Name(),
+		client: &mockClient{},
+	}
+
+	pi, err := pr.PathInfo()
+	assert.NoError(t, err)
+
+	s := NewSplitter(context.Background(), pi, 1, &mockClient{})
+
+	pi.Dest = nil
+	err = s.Download()
+	assert.EqualError(
+		t,
+		err,
+		"splitter: cannot truncate destination file: invalid argument",
+	)
+}
+
+func TestSplitter_Resume(t *testing.T) {
+	dir, f := initTmpStorage()
+	defer os.RemoveAll(dir)
+	_, _ = f.WriteString("abc")
+
+	mockResponse := &http.Response{
+		StatusCode:    200,
+		ProtoMajor:    1,
+		ProtoMinor:    0,
+		Header:        http.Header{"Content-Type": []string{"text/plain"}},
+		Body:          ioutil.NopCloser(strings.NewReader("def")),
+		ContentLength: 6,
+	}
+
+	GetGetFunc = func(url string) (resp *http.Response, err error) {
+		return mockResponse, nil
+	}
+
+	GetDoFunc = func(req *http.Request) (*http.Response, error) {
+		return mockResponse, nil
+	}
+
+	pr := PathResolver{
+		Source: "http://test-url.com/test/text",
+		Dest:   f.Name(),
+		client: &mockClient{},
+	}
+
+	pi, err := pr.PathInfo()
+	assert.NoError(t, err)
+
+	s := NewSplitter(context.Background(), pi, 1, &mockClient{})
+	pi.Dest = nil
+	err = s.Resume()
+	assert.EqualError(
+		t,
+		err,
+		"splitter: cannot fetch destination size: invalid argument",
+	)
+}
+
+func TestSplitterResumeFileStatError(t *testing.T) {
+	dir, f := initTmpStorage()
+	defer os.RemoveAll(dir)
+	_, _ = f.WriteString("abc")
+
+	mockResponse := &http.Response{
+		StatusCode:    200,
+		ProtoMajor:    1,
+		ProtoMinor:    0,
+		Header:        http.Header{"Content-Type": []string{"text/plain"}},
+		Body:          ioutil.NopCloser(strings.NewReader("def")),
+		ContentLength: 6,
+	}
+
+	GetGetFunc = func(url string) (resp *http.Response, err error) {
+		return mockResponse, nil
+	}
+
+	GetDoFunc = func(req *http.Request) (*http.Response, error) {
+		return mockResponse, nil
+	}
+
+	pr := PathResolver{
+		Source: "http://test-url.com/test/text",
+		Dest:   f.Name(),
+		client: &mockClient{},
+	}
+
+	pi, err := pr.PathInfo()
+	assert.NoError(t, err)
+
+	s := NewSplitter(context.Background(), pi, 1, &mockClient{})
+	err = s.Resume()
+	assert.NoError(t, err)
+}
+
 func TestDownloadChunkError(t *testing.T) {
 	s := splitterStub(nil)
 

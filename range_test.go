@@ -6,7 +6,7 @@ import (
 )
 
 func TestNextRange(t *testing.T) {
-	rb := NewRangeBuilder(100, 10)
+	rb := NewRangeBuilder(100, 10, 0)
 	lastRangeHeader := ""
 
 	for i := 0; i < 10; i++ {
